@@ -28,6 +28,31 @@ def select_channel(update, context):
     return MESSAGE
 
 
+def add_channel(update, context):
+    new_channel = update.message.text.split()[1]
+    if 'channels' not in context.user_data:
+        context.user_data['channels'] = []
+
+    if new_channel in context.user_data['channels']:
+        context.bot.send_message(chat_id=update.message.chat_id, text="Channel '{}' already exists".format(new_channel))
+    else:
+        chat_member = context.bot.get_chat_member(new_channel, context.bot.id)
+        if chat_member.status in ['administrator', 'creator']:
+            context.user_data['channels'].append(new_channel)
+            context.bot.send_message(chat_id=update.message.chat_id, text="Channel '{}' added successfully".format(new_channel))
+        else:
+            context.bot.send_message(chat_id=update.message.chat_id, text="The bot is not an admin in channel '{}'".format(new_channel))
+
+
+def remove_channel(update, context):
+    channel_to_remove = update.message.text.split()[1]
+    if 'channels' in context.user_data and channel_to_remove in context.user_data['channels']:
+        context.user_data['channels'].remove(channel_to_remove)
+        context.bot.send_message(chat_id=update.message.chat_id, text="Channel '{}' removed successfully".format(channel_to_remove))
+    else:
+        context.bot.send_message(chat_id=update.message.chat_id, text="Channel '{}' not found in list of channels".format(channel_to_remove))
+
+
 def message(update, context):
     query = update.callback_query
     if context.user_data.get("selected_channel") == "all":
@@ -99,6 +124,8 @@ def main():
     updater = Updater(token="YOUR_BOT_TOKEN", use_context=True)
     dispatcher = updater.dispatcher
     dispatcher.add_handler(conv_handler)
+    dispatcher.add_handler(CommandHandler("add", add_channel))
+    dispatcher.add_handler(CommandHandler("remove", remove_channel))
     dispatcher.add_handler(CommandHandler("help", help_command))
     updater.start_polling()
     updater.idle()
