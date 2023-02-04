@@ -23,7 +23,7 @@ This bot allows the user to send messages to multiple Telegram channels where th
 1. Clone this repository to your local machine.
 2. Install the required libraries using pip:
 ```
-$ pip install python-telegram-bot
+$ pip install python-telegram-bot==13.15
 ```
 3. Get a bot token from BotFather on Telegram.
 4. Replace `YOUR_BOT_TOKEN` in the code with your bot token.
